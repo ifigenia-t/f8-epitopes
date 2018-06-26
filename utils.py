@@ -1,6 +1,10 @@
-from Bio.PDB import PDBList
+import os
+
+import PeptideBuilder
 from Bio import SeqIO
+from Bio.PDB import PDBIO, PDBList
 from bioservices import UniProt
+from PeptideBuilder import Geometry
 
 LOCAL_STORAGE = "./local_files"
 
@@ -93,3 +97,79 @@ def get_missing_residues(uniprot_seq, pdb_seq):
             uniprot_seq_index += 1
 
     return results
+
+
+def generate_linear_peptides(pdb_seq):
+    """
+    Assembling all the linear Pepscan peptides into the protein sequence.
+    parameter: The PDB sequence.
+    Returns: A list containing all the looped peptides.
+    """
+    step = 5
+    peptide_mer = 20
+    linear_list = []
+
+    for i in range(0, len(pdb_seq), step):
+        peptide = pdb_seq[i:i+peptide_mer]
+        if len(peptide) is 20:
+            linear_list.append(peptide)
+
+    return linear_list
+
+
+def generate_looped_peptides(pdb_seq):
+    """
+    Assembling all the looped Pepscan peptides into the protein sequence, 
+    adding a C in the begging and in the end of every peptide respectfully.
+    parameter: The PDB sequence.
+    Returns: A list containing all the looped peptides.
+    """
+    step = 5
+    peptide_mer = 15
+    looped_list = []
+
+    for i in range(0, len(pdb_seq), step):
+        peptide = pdb_seq[i:i+peptide_mer]
+        if len(peptide) is 15:
+            looped_list.append('C{}C'.format(peptide))
+
+    return looped_list
+
+
+# Generate Pepscan Sequence:
+def generate_pepscan_seq(peptides_list, step, skip_first=False):
+    if skip_first is True:
+        start = 1
+    else:
+        start = 0
+
+    pepscan_seq_lp = ''
+
+    for i in peptides_list:
+        pepscan_seq_lp += i[start:step]
+
+    return pepscan_seq_lp
+
+
+def generate_peptide_pdb(peptide, filename):
+    for i, res in enumerate(peptide):
+        geo = Geometry.geometry(res)
+        if i == 0:
+            structure = PeptideBuilder.initialize_res(geo)
+        else:
+            structure = PeptideBuilder.add_residue(structure, geo)
+
+    out = PDBIO()
+    out.set_structure(structure)
+    out.save(filename)
+
+
+def peptide_list_to_pdb_files(peptide_list):
+    OUTPUT_FOLDER = 'output_files'
+
+    if not os.path.exists(OUTPUT_FOLDER):
+        os.makedirs(OUTPUT_FOLDER)
+
+    for i, peptide in enumerate(peptide_list):
+        filename = '{}/peptide_{}.pdb'.format(OUTPUT_FOLDER, i)
+        generate_peptide_pdb(peptide, filename)
