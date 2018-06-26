@@ -1,3 +1,4 @@
 biopython==1.71
 bioservices==1.5.2
 numpy==1.14.4
+PeptideBuilder==1.0.3
