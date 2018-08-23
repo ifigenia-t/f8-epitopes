@@ -18,7 +18,8 @@ class TestUtilMethods(unittest.TestCase):
     def test_generate_peptide_pdb(self):
         peptide = 'ATRRYYLGAVELSWDYMQSD'
         generate_peptide_pdb(peptide)
-
+    
+        
 
 if __name__ == '__main__':
     unittest.main()
