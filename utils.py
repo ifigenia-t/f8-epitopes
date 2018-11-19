@@ -1,6 +1,6 @@
 import operator
 import os
-
+import random
 import matplotlib.pyplot as plt
 import numpy as np
 import PeptideBuilder
@@ -378,9 +378,10 @@ def filter_epitopes(epitopes_ls, dssp_ls):
 
     return ep_ls
 
+
 def get_epitopes_locations(pdb_seq, epitopes_ls):
     indexes = []
-    
+
     for ep in epitopes_ls:
         ep_start = pdb_seq.find(ep)
         ep_end = ep_start + len(ep)
@@ -388,6 +389,7 @@ def get_epitopes_locations(pdb_seq, epitopes_ls):
         indexes.append({'start': ep_start, 'end': ep_end})
 
     return indexes
+
 
 def copy_freqs(overal, ep):
     res = []
@@ -491,7 +493,37 @@ def get_b_factors(pdb_id, index_start, index_end):
 
     bfactors_ls = [res['avg_bfactor'] for res in residues]
     if len(bfactors_ls) > 0:
-        avg =  np.average(bfactors_ls)
-    else: 
+        avg = np.average(bfactors_ls)
+    else:
         avg = 0
     return residues, avg
+
+
+def check_random_peptide(start, end, peptide_len, dssp_ls):
+    index =  random.randint(start, end-peptide_len)
+    index_stop = index + peptide_len
+    exposed_res = 0
+    for res in dssp_ls:
+        # find the index in dssp_ls
+        if res["dssp_index"] >= index and res["dssp_index"] <= index_stop:
+            # calculate the rel_asa of these res
+            if res['relative_asa'] >= 0.25:
+                # see how many of these res have rel_asa >= 0.25
+                exposed_res += 1        
+            
+        # see if this peptide have >= 3 res with >= 0.25
+    if exposed_res >= 3:
+        return True
+    
+    return False
+
+
+def check_num_random_peptides(num, dssp_ls):
+    total = 0
+    for i in range(1, num):
+        if check_random_peptide(1, 1340, random.choice([5, 10, 15]), dssp_ls):
+            total += 1
+
+    return (total/num)*100
+
+        
