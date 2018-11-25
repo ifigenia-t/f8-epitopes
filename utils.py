@@ -500,7 +500,7 @@ def get_b_factors(pdb_id, index_start, index_end):
 
 
 def check_random_peptide(start, end, peptide_len, dssp_ls):
-    index =  random.randint(start, end-peptide_len)
+    index = random.randint(start, end-peptide_len)
     index_stop = index + peptide_len
     exposed_res = 0
     for res in dssp_ls:
@@ -509,12 +509,12 @@ def check_random_peptide(start, end, peptide_len, dssp_ls):
             # calculate the rel_asa of these res
             if res['relative_asa'] >= 0.25:
                 # see how many of these res have rel_asa >= 0.25
-                exposed_res += 1        
-            
+                exposed_res += 1
+
         # see if this peptide have >= 3 res with >= 0.25
     if exposed_res >= 3:
         return True
-    
+
     return False
 
 
@@ -526,4 +526,20 @@ def check_num_random_peptides(num, dssp_ls):
 
     return (total/num)*100
 
-        
+
+def check_num_fixed_peptides(dssp_ls):
+    total = 0
+    # loop x number of times for 5
+    for i in range(1, 3):
+        if check_random_peptide(1, 1340, 5, dssp_ls):
+            total += 1
+    # loop x number of times for 10
+    for i in range(1, 7):
+        if check_random_peptide(1, 1340, 10, dssp_ls):
+            total += 1
+    # loop x number of times for 15
+    for i in range(1, 2):
+        if check_random_peptide(1, 1340, 15, dssp_ls):
+            total += 1
+    # total
+    return (total/12)*100

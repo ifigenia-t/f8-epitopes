@@ -4,9 +4,10 @@ import json
 from utils import (calculate_aa_freq, calculate_asa_avg,
                    calculate_distribution, calculate_dssp,
                    calculate_overal_rel_asa, calculate_ss_freq,
-                   check_num_random_peptides, filter_epitopes, get_b_factors,
-                   get_epitopes_locations, get_pdb_sequence,
-                   get_uniprot_sequence, plot_aa_freq, plot_ss_freq)
+                   check_num_fixed_peptides, check_num_random_peptides,
+                   filter_epitopes, get_b_factors, get_epitopes_locations,
+                   get_pdb_sequence, get_uniprot_sequence, plot_aa_freq,
+                   plot_ss_freq)
 
 parser = argparse.ArgumentParser(description='FVIII Epitope Identification.')
 parser.add_argument('--pdb_id', help="pdb_id to use", default='2r7e')
@@ -60,20 +61,58 @@ if args.dssp:
     overal_rel_asa = calculate_overal_rel_asa(dssp_ls)
     print(overal_rel_asa)
 
-if args.dssp_random: 
+if args.dssp_random:
     dssp_ls = calculate_dssp(pdb_id)
 
     sample_size = 10000
 
     print('Calculating exposed residues...')
     print('Sample size: {}'.format(sample_size))
-    
+
     total_percent = 0
+    total_percent_fixed = 0
+    count = 0
+    count_fixed = 0
+
+    percentages_random = {}
     for i in range(0, sample_size):
         percent = check_num_random_peptides(12, dssp_ls)
         total_percent += percent
+        rounded_per = int(round(percent))
+
+        if percent >= 91:
+            count += 1
+        if rounded_per not in percentages_random:
+            percentages_random[rounded_per] = 1
+        else:
+            percentages_random[rounded_per] += 1
+
+        if rounded_per >= 91:
+            count += 1
+
+    percentages_fixed = {}
+    for i in range(0, sample_size):
+        percent_fixed = check_num_fixed_peptides(dssp_ls)
+        total_percent_fixed += percent_fixed
+        rounded_per = int(round(percent_fixed))
+
+        if rounded_per not in percentages_fixed:
+            percentages_fixed[rounded_per] = 1
+        else:
+            percentages_fixed[rounded_per] += 1
+        if rounded_per >= 91:
+            count_fixed += 1
 
     print('Percentage: {0:.2f}%'.format(total_percent/sample_size))
+    print("More or equal to 91% out of {}: {}".format(sample_size, count))
+    for k, v in sorted(percentages_random.items()):
+        print('{}%: {}'.format(k, v))
+
+    print('Percentage fixed: {0:.2f}%'.format(total_percent_fixed/sample_size))
+    print("More or equal to 91% out of {}: {}".format(
+        sample_size, count_fixed))
+    for k, v in sorted(percentages_fixed.items()):
+        print('{}%: {}'.format(k, v))
 
 if args.plots:
     with open('local_data/dssp.json', 'r') as dssp_file, open(
