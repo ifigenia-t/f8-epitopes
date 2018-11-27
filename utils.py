@@ -530,15 +530,15 @@ def check_num_random_peptides(num, dssp_ls):
 def check_num_fixed_peptides(dssp_ls):
     total = 0
     # loop x number of times for 5
-    for i in range(1, 3):
+    for i in range(0, 3):
         if check_random_peptide(1, 1340, 5, dssp_ls):
             total += 1
     # loop x number of times for 10
-    for i in range(1, 7):
+    for i in range(0, 7):
         if check_random_peptide(1, 1340, 10, dssp_ls):
             total += 1
     # loop x number of times for 15
-    for i in range(1, 2):
+    for i in range(0, 2):
         if check_random_peptide(1, 1340, 15, dssp_ls):
             total += 1
     # total
