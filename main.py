@@ -1,6 +1,8 @@
 import argparse
 import json
 
+from collections import Counter
+
 from utils import (calculate_aa_freq, calculate_asa_avg,
                    calculate_distribution, calculate_dssp,
                    calculate_overal_rel_asa, calculate_ss_freq,
@@ -76,7 +78,7 @@ if args.dssp_random:
 
     percentages_random = {}
     for i in range(0, sample_size):
-        percent = check_num_random_peptides(12, dssp_ls)
+        percent, dist_ran = check_num_random_peptides(12, dssp_ls)
         total_percent += percent
         rounded_per = int(round(percent))
 
@@ -91,8 +93,22 @@ if args.dssp_random:
             count += 1
 
     percentages_fixed = {}
+
+    total_5 = Counter({})
+    total_10 = Counter({})
+    total_15 = Counter({})
+
     for i in range(0, sample_size):
-        percent_fixed = check_num_fixed_peptides(dssp_ls)
+        percent_fixed, dist = check_num_fixed_peptides(dssp_ls)
+
+        d_5 = Counter(dist[5])
+        d_10 = Counter(dist[10])
+        d_15 = Counter(dist[15])
+        
+        total_5 += d_5
+        total_10 += d_10
+        total_15 += d_15
+
         total_percent_fixed += percent_fixed
         rounded_per = int(round(percent_fixed))
 
@@ -102,6 +118,9 @@ if args.dssp_random:
             percentages_fixed[rounded_per] += 1
         if rounded_per >= 91:
             count_fixed += 1
+    print('Frequencies of exposed residues in peptides with length 5: {}'.format(total_5))
+    print('Frequencies of exposed residues in peptides with length 10: {}'.format(total_10))
+    print('Frequencies of exposed residues in peptides with length 15: {}'.format(total_15))
 
     print('Percentage: {0:.2f}%'.format(total_percent/sample_size))
     print("More or equal to 91% out of {}: {}".format(sample_size, count))

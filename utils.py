@@ -501,7 +501,7 @@ def get_b_factors(pdb_id, index_start, index_end):
 
 def check_random_peptide(start, end, peptide_len, dssp_ls):
     index = random.randint(start, end-peptide_len)
-    index_stop = index + peptide_len
+    index_stop = index + peptide_len - 1
     exposed_res = 0
     for res in dssp_ls:
         # find the index in dssp_ls
@@ -513,33 +513,56 @@ def check_random_peptide(start, end, peptide_len, dssp_ls):
 
         # see if this peptide have >= 3 res with >= 0.25
     if exposed_res >= 3:
-        return True
+        return True, exposed_res
 
-    return False
+    return False, 0
 
 
 def check_num_random_peptides(num, dssp_ls):
     total = 0
+    dist = {}
     for i in range(1, num):
-        if check_random_peptide(1, 1340, random.choice([5, 10, 15]), dssp_ls):
+        r, e_res = check_random_peptide(
+            1, 1340, random.choice([5, 10, 15]), dssp_ls)
+        if r:
             total += 1
+            if e_res not in dist:
+                dist[e_res] = 1
+            else:
+                dist[e_res] += 1
 
-    return (total/num)*100
+    return (total/num)*100, dist
 
 
 def check_num_fixed_peptides(dssp_ls):
     total = 0
     # loop x number of times for 5
+    dist = {5: {}, 10: {}, 15: {}}
     for i in range(0, 3):
-        if check_random_peptide(1, 1340, 5, dssp_ls):
+        r, e_res = check_random_peptide(1, 1340, 5, dssp_ls)
+        if r:
             total += 1
+            if e_res not in dist[5]:
+                dist[5][e_res] = 1
+            else:
+                dist[5][e_res] += 1
     # loop x number of times for 10
     for i in range(0, 7):
-        if check_random_peptide(1, 1340, 10, dssp_ls):
+        r, e_res = check_random_peptide(1, 1340, 10, dssp_ls)
+        if r:
             total += 1
+            if e_res not in dist[10]:
+                dist[10][e_res] = 1
+            else:
+                dist[10][e_res] += 1
     # loop x number of times for 15
     for i in range(0, 2):
-        if check_random_peptide(1, 1340, 15, dssp_ls):
+        r, e_res = check_random_peptide(1, 1340, 15, dssp_ls)
+        if r:
             total += 1
+            if e_res not in dist[15]:
+                dist[15][e_res] = 1
+            else:
+                dist[15][e_res] += 1
     # total
-    return (total/12)*100
+    return (total/12)*100, dist
