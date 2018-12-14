@@ -24,8 +24,7 @@ def download_pdb_file(pdb_id):
 
 
 def download_cif_file(pdb_id):
-    return pdbl.retrieve_pdb_file(
-        pdb_code=pdb_id, pdir=LOCAL_STORAGE)
+    return pdbl.retrieve_pdb_file(pdb_code=pdb_id, pdir=LOCAL_STORAGE)
 
 
 def get_pdb_sequence(pdb_id):
@@ -96,8 +95,10 @@ def get_missing_residues(uniprot_seq, pdb_seq):
             uniprot_seq_index += 1
             pdb_seq_index += 1
         else:
-            d = {"location": uniprot_seq_index, "residue": uniprot_seq
-                 [uniprot_seq_index]}
+            d = {
+                "location": uniprot_seq_index,
+                "residue": uniprot_seq[uniprot_seq_index]
+            }
             results.append(d)
             uniprot_seq_index += 1
 
@@ -115,7 +116,7 @@ def generate_linear_peptides(pdb_seq):
     linear_list = []
 
     for i in range(0, len(pdb_seq), step):
-        peptide = pdb_seq[i:i+peptide_mer]
+        peptide = pdb_seq[i:i + peptide_mer]
         if len(peptide) is 20:
             linear_list.append(peptide)
 
@@ -134,7 +135,7 @@ def generate_looped_peptides(pdb_seq):
     looped_list = []
 
     for i in range(0, len(pdb_seq), step):
-        peptide = pdb_seq[i:i+peptide_mer]
+        peptide = pdb_seq[i:i + peptide_mer]
         if len(peptide) is 15:
             looped_list.append('C{}C'.format(peptide))
 
@@ -154,6 +155,7 @@ def generate_pepscan_seq(peptides_list, step, skip_first=False):
         pepscan_seq_lp += i[start:step]
 
     return pepscan_seq_lp
+
 
 # Generate .pdb files of the peptides with PeptideBuilder
 
@@ -209,10 +211,9 @@ def count_aa(peptides, looped=False):
     freq = {}
 
     for k, v in sorted_count:
-        freq[k] = v/total_len
+        freq[k] = v / total_len
 
-    sorted_freq = sorted(
-        freq.items(), key=operator.itemgetter(1), reverse=True)
+    sorted_freq = sorted(freq.items(), key=operator.itemgetter(1), reverse=True)
 
     return sorted_count, sorted_freq
 
@@ -245,7 +246,7 @@ def calculate_overal_rel_asa(dssp_ls):
     for aa in dssp_ls:
         if aa["relative_asa"] >= 0.25:
             count += 1
-    return count/len(dssp_ls)
+    return count / len(dssp_ls)
 
 
 def plot_dssp(dssp_ls):
@@ -273,14 +274,12 @@ def calculate_aa_freq(dssp_ls):
             else:
                 count[aa["amino_acid"]] += 1
 
-    sorted_count = sorted(
-        count.items())
+    sorted_count = sorted(count.items())
 
     for k, v in sorted_count:
-        overal_freq[k] = v/total_len
+        overal_freq[k] = v / total_len
 
-    sorted_overal_freq = sorted(
-        overal_freq.items())
+    sorted_overal_freq = sorted(overal_freq.items())
 
     return sorted_count, sorted_overal_freq
 
@@ -303,12 +302,7 @@ def plot_overal_freq(sorted_overal_freq):
 
 
 def calculate_ss_freq(dssp_list):
-    counts = {
-        'loop': 0,
-        'strand': 0,
-        'helix': 0,
-        'total': 0
-    }
+    counts = {'loop': 0, 'strand': 0, 'helix': 0, 'total': 0}
 
     for aa in dssp_list:
         if aa['relative_asa'] >= 0.25:
@@ -324,9 +318,9 @@ def calculate_ss_freq(dssp_list):
                 counts['helix'] += 1
 
     freqs = {
-        'loop': counts['loop']/counts['total'],
-        'strand': counts['strand']/counts['total'],
-        'helix': counts['helix']/counts['total'],
+        'loop': counts['loop'] / counts['total'],
+        'strand': counts['strand'] / counts['total'],
+        'helix': counts['helix'] / counts['total'],
     }
 
     return freqs
@@ -343,8 +337,7 @@ def get_seq(dssp_list):
 
 def plot_ss_freq(overal_freqs, ep_freqs):
     n_groups = 3
-    o_ls = (overal_freqs['loop'], overal_freqs['strand'],
-            overal_freqs['helix'])
+    o_ls = (overal_freqs['loop'], overal_freqs['strand'], overal_freqs['helix'])
     e_ls = (ep_freqs['loop'], ep_freqs['strand'], ep_freqs['helix'])
 
     fig, ax = plt.subplots()
@@ -352,8 +345,8 @@ def plot_ss_freq(overal_freqs, ep_freqs):
     bar_width = 0.2
 
     plt.bar(index, o_ls, bar_width, color='teal', label='Overal')
-    plt.bar(index + bar_width, e_ls, bar_width, color='indianred',
-            label='Epitopes')
+    plt.bar(
+        index + bar_width, e_ls, bar_width, color='indianred', label='Epitopes')
 
     plt.xlabel('Secondary Structure Elements')
     plt.ylabel('Frequency')
@@ -419,8 +412,8 @@ def plot_aa_freq(overal_freqs, ep_freqs):
     bar_width = 0.3
 
     plt.bar(index, o_ls, bar_width, color='teal', label='Overal')
-    plt.bar(index + bar_width, e_ls, bar_width, color='indianred',
-            label='Epitopes')
+    plt.bar(
+        index + bar_width, e_ls, bar_width, color='indianred', label='Epitopes')
 
     plt.xlabel('Amino Acids')
     plt.ylabel('Frequency')
@@ -500,7 +493,7 @@ def get_b_factors(pdb_id, index_start, index_end):
 
 
 def check_random_peptide(start, end, peptide_len, dssp_ls):
-    index = random.randint(start, end-peptide_len)
+    index = random.randint(start, end - peptide_len)
     index_stop = index + peptide_len - 1
     exposed_res = 0
     for res in dssp_ls:
@@ -515,15 +508,15 @@ def check_random_peptide(start, end, peptide_len, dssp_ls):
     if exposed_res >= 3:
         return True, exposed_res
 
-    return False, 0
+    return False, exposed_res
 
 
 def check_num_random_peptides(num, dssp_ls):
     total = 0
     dist = {}
     for i in range(1, num):
-        r, e_res = check_random_peptide(
-            1, 1340, random.choice([5, 10, 15]), dssp_ls)
+        r, e_res = check_random_peptide(1, 1340, random.choice([5, 10, 15]),
+                                        dssp_ls)
         if r:
             total += 1
             if e_res not in dist:
@@ -531,7 +524,7 @@ def check_num_random_peptides(num, dssp_ls):
             else:
                 dist[e_res] += 1
 
-    return (total/num)*100, dist
+    return (total / num) * 100, dist
 
 
 def check_num_fixed_peptides(dssp_ls):
@@ -547,7 +540,7 @@ def check_num_fixed_peptides(dssp_ls):
             else:
                 dist[5][e_res] += 1
     # loop x number of times for 10
-    for i in range(0, 7):
+    for i in range(0, 6):
         r, e_res = check_random_peptide(1, 1340, 10, dssp_ls)
         if r:
             total += 1
@@ -556,7 +549,7 @@ def check_num_fixed_peptides(dssp_ls):
             else:
                 dist[10][e_res] += 1
     # loop x number of times for 15
-    for i in range(0, 2):
+    for i in range(0, 3):
         r, e_res = check_random_peptide(1, 1340, 15, dssp_ls)
         if r:
             total += 1
@@ -565,4 +558,68 @@ def check_num_fixed_peptides(dssp_ls):
             else:
                 dist[15][e_res] += 1
     # total
-    return (total/12)*100, dist
+
+    return (total / 12) * 100, dist
+
+
+def check_average_exp_residues(dssp_ls):
+    # check the average of exposed residues in the peptides
+    total_5 = 0
+    total_10 = 0
+    total_15 = 0
+    total_num_exposed_residues_5 = 0
+    total_num_exposed_residues_10 = 0
+    total_num_exposed_residues_15 = 0
+    for i in range(0, 3):
+        r, e_res = check_random_peptide(1, 1340, 5, dssp_ls)
+        total_5 += e_res
+        total_num_exposed_residues_5 = total_5 / 3
+
+    for i in range(0, 6):
+        r, e_res = check_random_peptide(1, 1340, 10, dssp_ls)
+        total_10 += e_res
+        total_num_exposed_residues_10 = total_10 / 6
+
+    for i in range(0, 3):
+        r, e_res = check_random_peptide(1, 1340, 15, dssp_ls)
+        total_15 += e_res
+        total_num_exposed_residues_15 = total_15 / 3
+
+    return total_num_exposed_residues_5, total_num_exposed_residues_10, total_num_exposed_residues_15
+
+
+def check_num_fixed_peptides_all_peaks(dssp_ls):
+    total = 0
+    # loop x number of times for length 20
+    for i in range(0, 26):
+        r, e_res = check_random_peptide(1, 1340, 20, dssp_ls)
+        if r:
+            total += 1
+
+    # loop x number of times for length 15
+    for i in range(0, 20):
+        r, e_res = check_random_peptide(1, 1340, 15, dssp_ls)
+        if r:
+            total += 1
+
+    return (total / 46) * 100
+
+
+def check_average_exp_residues_all_peaks(dssp_ls):
+    # check the average of exposed residues in the peptides
+    total_15 = 0
+    total_20 = 0
+    total_num_exposed_residues_15 = 0
+    total_num_exposed_residues_20 = 0
+
+    for i in range(0, 20):
+        r, e_res = check_random_peptide(1, 1340, 15, dssp_ls)
+        total_15 += e_res
+        total_num_exposed_residues_15 = total_15 / 20
+
+    for i in range(0, 26):
+        r, e_res = check_random_peptide(1, 1340, 20, dssp_ls)
+        total_20 += e_res
+        total_num_exposed_residues_20 = total_20 / 26
+
+    return total_num_exposed_residues_15, total_num_exposed_residues_20
