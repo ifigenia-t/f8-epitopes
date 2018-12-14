@@ -75,7 +75,12 @@ if args.dssp_random:
     total_percent = 0
     total_percent_fixed = 0
     count = 0
+    count_5 = 0
+    count_10 = 0
+    count_15 = 0
     count_all = 0
+    count_15_all = 0
+    count_20_all = 0
     count_fixed = 0
     total_avg_exp_res_5 = 0
     total_avg_exp_res_10 = 0
@@ -110,6 +115,12 @@ if args.dssp_random:
         total_avg_exp_res_5 += avg_exp_res_5
         total_avg_exp_res_10 += avg_exp_res_10
         total_avg_exp_res_15 += avg_exp_res_15
+        if avg_exp_res_5 >= 2.6:
+            count_5 += 1
+        if avg_exp_res_10 >= 6:
+            count_10 += 1
+        if avg_exp_res_15 >= 9.3:
+            count_15 += 1
 
         # total_5 += d_5
         # total_10 += d_10
@@ -138,13 +149,11 @@ if args.dssp_random:
         total_avg_exp_res_20 += avg_exp_res_20
         if percent_fixed_all >= 97:
             count_all += 1
+        if avg_exp_res_15_all >= 7.9:
+            count_15_all += 1
+        if avg_exp_res_20 >= 10.8:
+            count_20_all += 1
 
-    # print('Frequencies of exposed residues in peptides with length 5: {}'.
-    #       format(total_5))
-    # print('Frequencies of exposed residues in peptides with length 10: {}'.
-    #       format(total_10))
-    # print('Frequencies of exposed residues in peptides with length 15: {}'.
-    #       format(total_15))
     print(" ")
 
     print('Percentage: {0:.2f}%'.format(total_percent / sample_size))
@@ -152,19 +161,24 @@ if args.dssp_random:
     for k, v in sorted(percentages_random.items()):
         print('{}%: {}'.format(k, v))
 
+    # Print about the fixed peptides
     print('Percentage fixed: {0:.2f}%'.format(
         total_percent_fixed / sample_size))
+    print("More or equal to 91% out of {}: {}".format(sample_size, count_fixed))
     print('Average of exposed residues in 5: {}'.format(
         (total_avg_exp_res_5 / sample_size)))
     print('Average of exposed residues in 10: {}'.format(
         (total_avg_exp_res_10 / sample_size)))
     print('Average of exposed residues in 15: {}'.format(
         (total_avg_exp_res_15 / sample_size)))
-    print("More or equal to 91% out of {}: {}".format(sample_size, count_fixed))
+    print("More or equal to 2.6 out of {}: {}".format(sample_size, count_5))
+    print("More or equal to 6 out of {}: {}".format(sample_size, count_10))
+    print("More or equal to 9.3 out of {}: {}".format(sample_size, count_15))
+
     for k, v in sorted(percentages_fixed.items()):
         print('{}%: {}'.format(k, v))
 
-#print for all the peaks
+    # print for all the peaks
     print(" ")
     print("Calculations for all peaks")
     print('Percentage: {0:.2f}%'.format(total_percent_fixed_all / sample_size))
@@ -173,6 +187,10 @@ if args.dssp_random:
         (total_avg_exp_res_15_all / sample_size)))
     print('Average of exposed residues in 20: {}'.format(
         (total_avg_exp_res_20 / sample_size)))
+    print("More or equal to 7.9 out of {}: {}".format(sample_size,
+                                                      count_15_all))
+    print("More or equal to 10.8 out of {}: {}".format(sample_size,
+                                                       count_20_all))
 
 if args.plots:
     with open('local_data/dssp.json', 'r') as dssp_file, open(
