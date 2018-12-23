@@ -570,6 +570,7 @@ def check_average_exp_residues(dssp_ls):
     total_num_exposed_residues_5 = 0
     total_num_exposed_residues_10 = 0
     total_num_exposed_residues_15 = 0
+    total = 0
     for i in range(0, 3):
         r, e_res = check_random_peptide(1, 1340, 5, dssp_ls)
         total_5 += e_res
@@ -585,7 +586,13 @@ def check_average_exp_residues(dssp_ls):
         total_15 += e_res
         total_num_exposed_residues_15 = total_15 / 3
 
-    return total_num_exposed_residues_5, total_num_exposed_residues_10, total_num_exposed_residues_15
+    total = total_5 + total_10 + total_15
+
+    return (total_num_exposed_residues_5, total_num_exposed_residues_10,
+            total_num_exposed_residues_15, total)
+
+
+# Calculations for all the peaks
 
 
 def check_num_fixed_peptides_all_peaks(dssp_ls):

@@ -82,6 +82,7 @@ if args.dssp_random:
     count_15_all = 0
     count_20_all = 0
     count_fixed = 0
+    count_exp_res = 0
     total_avg_exp_res_5 = 0
     total_avg_exp_res_10 = 0
     total_avg_exp_res_15 = 0
@@ -109,8 +110,12 @@ if args.dssp_random:
 
     for i in range(0, sample_size):
         percent_fixed, dist = check_num_fixed_peptides(dssp_ls)
-        avg_exp_res_5, avg_exp_res_10, avg_exp_res_15 = check_average_exp_residues(
-            dssp_ls)
+        (avg_exp_res_5, avg_exp_res_10, avg_exp_res_15,
+         total_res) = check_average_exp_residues(dssp_ls)
+        # new calculations for the total exposed residues
+        total_exp_res = (total_res / 120) * 100
+        if total_exp_res >= 60:
+            count_exp_res += 1
 
         total_avg_exp_res_5 += avg_exp_res_5
         total_avg_exp_res_10 += avg_exp_res_10
@@ -121,10 +126,6 @@ if args.dssp_random:
             count_10 += 1
         if avg_exp_res_15 >= 9.3:
             count_15 += 1
-
-        # total_5 += d_5
-        # total_10 += d_10
-        # total_15 += d_15
 
         total_percent_fixed += percent_fixed
         rounded_per = int(round(percent_fixed))
@@ -177,7 +178,8 @@ if args.dssp_random:
 
     for k, v in sorted(percentages_fixed.items()):
         print('{}%: {}'.format(k, v))
-
+    # print for the new calculations for the total exposed residues
+    print("More or equal to 60% exposed res: {}".format(count_exp_res))
     # print for all the peaks
     print(" ")
     print("Calculations for all peaks")
